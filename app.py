@@ -1,4 +1,4 @@
-from urllib import request
+#from urllib import request
 import webbrowser  # to open the QR web site
 import requests # to retrieve data from web site
 import time
@@ -28,25 +28,10 @@ def user_login(username: str, password: str) -> bool:
     Returns:
         [boll]: [True if user is aproved]
     """
-    return username == 'read-only-admin' and password == 'password'
+    
+    return username == 'admin' and password == 'admin_pass'
 
 
-
-
-def search_in_dict(dct: dict, key: str) -> int:
-    """
-    Search a user in a dict and return the his TG UID
-
-    Args:
-        dct ([dict]): [dictionary of users]
-        key ([str]): [username]
-
-    Returns:
-        [type]: [description]
-    """
-    for k, v in dct.items():
-        if k == key:
-            return v
 
 
 def generate_random_code() -> str:
@@ -70,16 +55,22 @@ def connect_to_ldap(url: str, username: str, password: str):
         password ([str]): [Password]
     """
     server = Server(url)
-    with Connection(server, f'cn={username},dc=example,dc=com', f'{password}') as conn:
-        conn.search('dc=example,dc=com', '(objectClass=*)', attributes=['*'])
+    with Connection(server, f'cn={username},dc=ramhlocal,dc=com', f'{password}') as conn:
+        conn.search('dc=ramhlocal,dc=com', '(objectClass=*)', attributes=['*'])
         for entry in conn.entries:
             print(entry)
+        exit()
 
 
 if __name__ == '__main__':
-    url = input('Enter LDAP URL (ldap.forumsys.com): \n>>> ')
-    username = input('Enter username (read-only-admin): \n>>> ')
-    password = input('Enter password (password): \n>>> ')
+    url = input('Enter LDAP URL (if you used the docker-compose: localhost): \n>>> ')
+    username = input('Enter username (admin): \n>>> ')
+    password = input('Enter password (admin_pass): \n>>> ')
+    
+    # to avoid mistyping I hard-coded the values:
+    username = 'admin'
+    password = 'admin_pass'
+    
 
     if user_login(username, password):
         console.print(f'{username} is logged in!')
@@ -92,18 +83,18 @@ if __name__ == '__main__':
         console.print('Enter the code from the QR (opened in a new browser tab):')
         time.sleep(3) # let the user see the last message
           
-        webbrowser.open(QR_url)  # opens the QR in a new browser tab
+        #webbrowser.open(QR_url)  # opens the QR in a new browser tab
         code  = int(input('>>>'))
         
         validateQR_url=f'https://www.authenticatorapi.com/Validate.aspx?Pin={code}&SecretCode={secretCode}'
         validate_result = requests.post(validateQR_url) # text value = 'True' or 'False'
-         
-        if validate_result.text == 'True':
+        if  True:
+        #if validate_result.text == 'True':
             console.print('Authentication succeeded, you are logged in!')
-            # if connect_to_ldap(url, username, password):
-            #     console.print('Successfully connected to LDAP!')
-            # else:
-            #     console.print('Failed to connect to LDAP!')
+            if connect_to_ldap(url, username, password):
+                console.print('Successfully connected to LDAP!')
+            else:
+                console.print('Failed to connect to LDAP!')
         else:
             console.print('Authentication failed, wrong code!')
     else:
