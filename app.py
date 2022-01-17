@@ -22,8 +22,8 @@ def user_login(username: str, password: str) -> bool:
     First auth of the user
 
     Args:
-        username ([str]): [Username]
-        password ([str]): [Password]
+        username ([str]): [admin]
+        password ([str]): [admin_pass]
 
     Returns:
         [boll]: [True if user is aproved]
@@ -51,8 +51,8 @@ def connect_to_ldap(url: str, username: str, password: str):
 
     Args:
         url ([str]): [LDAP server url]
-        username ([str]): [Username]
-        password ([str]): [Password]
+        username ([str]): [admin]
+        password ([str]): [admin_pass]
     """
     server = Server(url)
     with Connection(server, f'cn={username},dc=ramhlocal,dc=com', f'{password}') as conn:
@@ -63,34 +63,36 @@ def connect_to_ldap(url: str, username: str, password: str):
 
 
 if __name__ == '__main__':
-    url = input('Enter LDAP URL (if you used the docker-compose: localhost): \n>>> ')
+    url = input('Enter LDAP URL (localhost): \n>>> ')
     username = input('Enter username (admin): \n>>> ')
     password = input('Enter password (admin_pass): \n>>> ')
     
-    # to avoid mistyping I hard-coded the values:
+    # to avoid mistyping I hard coded the values:
+    url = 'localhost'
     username = 'admin'
-    password = 'admin_pass'
+    password = 'admin_pass' 
     
 
     if user_login(username, password):
         console.print(f'{username} is logged in!')
         
         appName="OpenLdap" # for the Google Authentication API url
-        secretCode = generate_random_code() # for the Google Authentication API url
+        generated_Code = generate_random_code() # for the Google Authentication API url
         
-        QR_url =f'https://www.authenticatorapi.com/pair.aspx?AppName={appName}&AppInfo={username}&SecretCode={secretCode}'
+        QR_url =f'https://www.authenticatorapi.com/pair.aspx?AppName={appName}&AppInfo={username}&SecretCode={generated_Code}'
         
-        console.print('Enter the code from the QR (opened in a new browser tab):')
+        console.print('Enter the code from the QR (Check new tab in your browser):')
         time.sleep(3) # let the user see the last message
           
-        #webbrowser.open(QR_url)  # opens the QR in a new browser tab
-        code  = int(input('>>>'))
+        webbrowser.open(QR_url)  # opens the QR in a new browser tab
+        pin_code  = int(input('>>>'))
         
-        validateQR_url=f'https://www.authenticatorapi.com/Validate.aspx?Pin={code}&SecretCode={secretCode}'
+        validateQR_url=f'https://www.authenticatorapi.com/Validate.aspx?Pin={pin_code}&SecretCode={generated_Code}'
         validate_result = requests.post(validateQR_url) # text value = 'True' or 'False'
-        if  True:
-        #if validate_result.text == 'True':
-            console.print('Authentication succeeded, you are logged in!')
+        
+        if validate_result.text == 'True':
+            console.print('Authentication succeeded, you are logged in!\n Feching Data...')
+            time.sleep(3) # let the user see the last message
             if connect_to_ldap(url, username, password):
                 console.print('Successfully connected to LDAP!')
             else:
