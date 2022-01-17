@@ -2,7 +2,9 @@
 - Python Script that simulates a user login and performs authentication via Google Authentication MFA.   
 - Once the authentication is complete, the script will connect to `localhost` and pull data to the terminal.
 - First run `docker-compose up` to spin up an OpenLdap docker on your localhost:80
- 
+- Login DN: `cn=admin,dc=ramhlocal,dc=com`
+- Password: `admin_pass`
+- Then run app.py 
 
 Property  | Value
 ----------|---------------
