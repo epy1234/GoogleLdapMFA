@@ -83,25 +83,22 @@ if __name__ == '__main__':
 
     if user_login(username, password):
         console.print(f'{username} is logged in!')
-        appName="OpenLdap"
-        PASS = generate_random_code()
-        # the url go generate a Google Authentication QR 6 digits number.
-        # SecretCode - A secret code that only you know
-        QR_url =f'https://www.authenticatorapi.com/pair.aspx?AppName={appName}&AppInfo={username}&SecretCode={PASS}'
         
-        print('Enter the code  from the QR (opened in a new browser tab):')
+        appName="OpenLdap" # for the Google Authentication API url
+        secretCode = generate_random_code() # for the Google Authentication API url
+        
+        QR_url =f'https://www.authenticatorapi.com/pair.aspx?AppName={appName}&AppInfo={username}&SecretCode={secretCode}'
+        
+        console.print('Enter the code from the QR (opened in a new browser tab):')
         time.sleep(3) # let the user see the last message
-        
-        #code  = int(input('Enter the code  from the QR (opened in a new browser tab): \n>>> '))
+          
         webbrowser.open(QR_url)  # opens the QR in a new browser tab
-        
         code  = int(input('>>>'))
-        #code = int(input('Enter the code from auth bot:\n'))
-
-        validateQR_url=f'https://www.authenticatorapi.com/Validate.aspx?Pin={code}&SecretCode={PASS}'
-        validate_qr = requests.post(validateQR_url) # text value = 'True' or 'False'
-        print(validate_qr.text)
-        if validate_qr.text == 'True':
+        
+        validateQR_url=f'https://www.authenticatorapi.com/Validate.aspx?Pin={code}&SecretCode={secretCode}'
+        validate_result = requests.post(validateQR_url) # text value = 'True' or 'False'
+         
+        if validate_result.text == 'True':
             console.print('Authentication succeeded, you are logged in!')
             # if connect_to_ldap(url, username, password):
             #     console.print('Successfully connected to LDAP!')
