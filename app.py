@@ -91,8 +91,7 @@ if __name__ == '__main__':
         validate_result = requests.post(validateQR_url) # text value = 'True' or 'False'
         
         if validate_result.text == 'True':
-            console.print('Authentication succeeded, you are logged in!\n Feching Data...')
-            time.sleep(3) # let the user see the last message
+            console.print('Authentication succeeded, you are logged in!')
             if connect_to_ldap(url, username, password):
                 console.print('Successfully connected to LDAP!')
             else:
