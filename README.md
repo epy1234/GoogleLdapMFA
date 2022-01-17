@@ -1,6 +1,7 @@
 #### LDAP MFA Demo code
 - Python Script that simulates a user login and performs authentication via Google Authentication MFA.   
 - Once the authentication is complete, the script will connect to `localhost` and pull data to the terminal.
+- first run docker-compose from my other repo: 
 
 Property  | Value
 ----------|---------------
