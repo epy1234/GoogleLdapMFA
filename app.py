@@ -1,23 +1,18 @@
 from urllib import request
 import webbrowser  # to open the QR web site
+import requests # to retrieve data from web site
 import time
 import os
 import random
 import string
-
 
 from rich import print
 from dotenv import load_dotenv
 from rich.console import Console
 from ldap3 import Server, Connection
 
-# Constants
 
 load_dotenv()
-
-PASS = 1234 # sample
-
-
 
 console = Console()
 
@@ -36,18 +31,6 @@ def user_login(username: str, password: str) -> bool:
     return username == 'read-only-admin' and password == 'password'
 
 
-def telegram_bot(api_token: str):
-    """
-    Function to create a bot, generate random code and send it to the user
-
-    Args:
-        api_token ([str]): [TG Bot Api Token]
-    """
-    global PASS
-    bot = telebot.TeleBot(api_token)
-    PASS = int(generate_random_code())
-
-    bot.send_message(search_in_dict(aproved_users, username), PASS)
 
 
 def search_in_dict(dct: dict, key: str) -> int:
@@ -76,6 +59,7 @@ def generate_random_code() -> str:
     return ''.join(random.choice(string.digits) for _ in range(6))
 
 
+
 def connect_to_ldap(url: str, username: str, password: str):
     """
     Connect to LDAP server and print the entries
@@ -99,13 +83,14 @@ if __name__ == '__main__':
 
     if user_login(username, password):
         console.print(f'{username} is logged in!')
-        #telegram_bot(TOKEN)
+        appName="OpenLdap"
+        PASS = generate_random_code()
         # the url go generate a Google Authentication QR 6 digits number.
         # SecretCode - A secret code that only you know
-        QR_url ='https://www.authenticatorapi.com/pair.aspx?AppName=EfyEisikovits&AppInfo='+username+'&SecretCode=1234'
+        QR_url =f'https://www.authenticatorapi.com/pair.aspx?AppName={appName}&AppInfo={username}&SecretCode={PASS}'
         
         print('Enter the code  from the QR (opened in a new browser tab):')
-        time.sleep(3) # Sleep for 3 seconds
+        time.sleep(3) # let the user see the last message
         
         #code  = int(input('Enter the code  from the QR (opened in a new browser tab): \n>>> '))
         webbrowser.open(QR_url)  # opens the QR in a new browser tab
@@ -113,17 +98,17 @@ if __name__ == '__main__':
         code  = int(input('>>>'))
         #code = int(input('Enter the code from auth bot:\n'))
 
-        validateQR_url='https://www.authenticatorapi.com/Validate.aspx?Pin='+str(code)+'&SecretCode=1234'
-        x = requests.post(validateQR_url)
-        print(x.text)
-        if x.text == 'True':
-            console.print('You are logged in!')
-            if connect_to_ldap(url, username, password):
-                console.print('Successfully connected to LDAP!')
-            else:
-                console.print('Failed to connect to LDAP!')
+        validateQR_url=f'https://www.authenticatorapi.com/Validate.aspx?Pin={code}&SecretCode={PASS}'
+        validate_qr = requests.post(validateQR_url) # text value = 'True' or 'False'
+        print(validate_qr.text)
+        if validate_qr.text == 'True':
+            console.print('Authentication succeeded, you are logged in!')
+            # if connect_to_ldap(url, username, password):
+            #     console.print('Successfully connected to LDAP!')
+            # else:
+            #     console.print('Failed to connect to LDAP!')
         else:
-            console.print('Wrong code!')
+            console.print('Authentication failed, wrong code!')
     else:
         console.print('Wrong username or password!')
         exit()
