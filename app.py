@@ -1,11 +1,10 @@
 from urllib import request
 import webbrowser  # to open the QR web site
-import requests # to retrieve data from web site
 import time
 import os
 import random
 import string
-# import telebot // not relevant for my assigenment
+
 
 from rich import print
 from dotenv import load_dotenv
@@ -22,12 +21,6 @@ PASS = 1234 # sample
 
 console = Console()
 
- # Approved users, username: telegram_id
-#aproved_users = {
-#     'read-only-admin': TG_UID,  # Value: Telegram UID (int)
-#}
-
-print("PASS=",PASS)
 
 def user_login(username: str, password: str) -> bool:
     """
