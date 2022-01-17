@@ -1,12 +1,12 @@
 #### LDAP MFA Demo code
 - Python Script that simulates a user login and performs authentication via Google Authentication MFA.   
-- Once the authentication is complete, the script will connect to `ldap.forumsys.com` and pull data to the terminal.
+- Once the authentication is complete, the script will connect to `localhost` and pull data to the terminal.
 
 Property  | Value
 ----------|---------------
-server    | ldap.forumsys.com
-user      | read-only-admin
-password  | password
+server    | localhost
+user      | admin
+password  | admin_pass
 
 ### Python libraries used in this script:
 
